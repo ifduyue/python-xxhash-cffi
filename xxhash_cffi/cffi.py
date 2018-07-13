@@ -2,7 +2,7 @@ import sys
 import struct
 import binascii
 
-from xxhash._cffi import ffi, lib
+from xxhash_cffi._cffi import ffi, lib
 
 PY3 = sys.version_info[0] == 3
 

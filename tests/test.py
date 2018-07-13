@@ -4,7 +4,7 @@ import unittest
 import random
 import struct
 import sys
-import xxhash
+import xxhash_cffi as xxhash
 
 
 def getrefcount(obj):

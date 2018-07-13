@@ -4,13 +4,12 @@
 from setuptools import setup, Extension
 import os
 
-with open('xxhash/__init__.py') as f:
+with open('xxhash_cffi/__init__.py') as f:
     for line in f:
         if line.startswith('VERSION = '):
             VERSION = eval(line.rsplit(None, 1)[-1])
             break
 
-USE_CPYTHON = os.getenv('XXHASH_FORCE_CFFI') in (None, '0')
 setup_kwargs = {}
 
 if os.name == 'posix':
@@ -26,32 +25,22 @@ if os.name == 'posix':
 else:
     extra_compile_args = None
 
-if USE_CPYTHON:
-    setup_kwargs['ext_modules'] = [
-        Extension(
-            'cpython',
-            ['xxhash/cpython.c', 'deps/xxhash/xxhash.c'],
-            extra_compile_args=extra_compile_args,
-            include_dirs=['deps/xxhash']
-        )
-    ]
-else:
-    setup_kwargs['install_requires'] = ['cffi']
-    setup_kwargs['setup_requires'] = ['cffi']
-    setup_kwargs['cffi_modules'] = ['ffibuild.py:ffi']
+setup_kwargs['install_requires'] = ['cffi']
+setup_kwargs['setup_requires'] = ['cffi']
+setup_kwargs['cffi_modules'] = ['ffibuild.py:ffi']
 
 setup(
-    name='xxhash',
+    name='xxhash-cffi',
     version=VERSION,
     description="Python binding for xxHash",
     long_description=open('README.rst', 'r').read(),
     long_description_content_type="text/x-rst",
     author='Yue Du',
     author_email='ifduyue@gmail.com',
-    url='https://github.com/ifduyue/python-xxhash',
+    url='https://github.com/ifduyue/python-xxhash-cffi',
     license='BSD',
-    packages=['xxhash'],
-    ext_package='xxhash',
+    packages=['xxhash_cffi'],
+    ext_package='xxhash_cffi',
     test_suite='nose.collector',
     tests_require=['nose>1.3.0'],
     classifiers=[
@@ -68,8 +57,6 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
     ],
     **setup_kwargs
 )
