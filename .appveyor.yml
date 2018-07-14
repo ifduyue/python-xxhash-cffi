@@ -20,6 +20,7 @@ install:
     - git --version
     - '%PYTHON%\python.exe --version'
     - git submodule update --init --recursive
+    - '%PYTHON%\scripts\pip.exe install certifi'
     - '%PYTHON%\scripts\pip.exe install urllib3[secure]'
     - '%PYTHON%\scripts\pip.exe install cffi wheel'
     - '%PYTHON%\scripts\pip.exe --version'
