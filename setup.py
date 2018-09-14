@@ -10,25 +10,6 @@ with open('xxhash_cffi/__init__.py') as f:
             VERSION = eval(line.rsplit(None, 1)[-1])
             break
 
-setup_kwargs = {}
-
-if os.name == 'posix':
-    extra_compile_args = [
-        "-std=c99",
-        "-O3",
-        "-Wall",
-        "-W",
-        "-Wundef",
-        # ref: http://bugs.python.org/issue21121
-        "-Wno-error=declaration-after-statement",
-    ]
-else:
-    extra_compile_args = None
-
-setup_kwargs['install_requires'] = ['cffi']
-setup_kwargs['setup_requires'] = ['cffi']
-setup_kwargs['cffi_modules'] = ['ffibuild.py:ffi']
-
 setup(
     name='xxhash-cffi',
     version=VERSION,
@@ -41,6 +22,9 @@ setup(
     license='BSD',
     packages=['xxhash_cffi'],
     ext_package='xxhash_cffi',
+    install_requires = ['cffi'],
+    setup_requires = ['cffi'],
+    cffi_modules = ['ffibuild.py:ffi'],
     test_suite='nose.collector',
     tests_require=['nose>1.3.0'],
     classifiers=[
@@ -58,5 +42,4 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    **setup_kwargs
 )
