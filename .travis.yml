@@ -1,18 +1,89 @@
 language: python
 
-python:
-- 2.6
-- 2.7
-- 3.3
-- 3.4
-- 3.5
-- 3.6
-- 3.7-dev
-- pypy
-- pypy3
+matrix:
+  allow_failures:
+    - python: pypy
+    - python: pypy3
+    - python: 3.8-dev
+    - python: nightly
+  include:
+    - python: 2.6
+    - python: 2.7
+    - python: 3.3
+    - python: 3.4
+    - python: 3.5
+      dist: xenial
+    - python: 3.6
+      dist: xenial
+    - python: 3.7
+      dist: xenial
+    - python: 3.8-dev
+      dist: xenial
+    - python: nightly
+      dist: xenial
+    - python: pypy
+    - python: pypy3
+    # linux wheels
+    - dist: trusty
+      sudo: required
+      services:
+        - docker
+      env: XXHASH_BUILDWHEELS=1
+    # osx wheels
+    - os: osx
+      osx_image: xcode9.4
+      language: generic
+      env: XXHASH_BUILDWHEELS=1
+      before_install:
+        - SSL_CERT_FILE=$(brew --prefix)/etc/openssl/cert.pem
+        - sudo pip install -U pip setuptools twine
 
 install:
-- pip install cffi
-- gcc --version
+  - |
+    if [[ $TRAVIS_PYTHON_VERSION == "2.6" ]]; then
+      pip install cffi 'pycparser<2.19'
+    else
+      pip install cffi
+    fi
+  - |
+    if [ -n "${XXHASH_BUILDWHEELS:-}" ]; then
+      pip install cibuildwheel
+    fi
 
-script: python setup.py test
+script:
+  - |
+    if [ -n "${XXHASH_BUILDWHEELS:-}" ]; then
+      cibuildwheel --output-dir dist
+    else
+      python setup.py test
+    fi
+
+
+deploy:
+  # deploy master non-tags to Test PyPI
+  - provider: pypi
+    user: ifduyue
+    password:
+      secure: "cQru1dsoLM+lO1CTM+7h93CITuMSp210Xoy4w1Ifz3R+myi5/shPl0sVSKb3pVSyBKkKGKgbacAISQF6zgDQxfcMgv1No63KQWJoT7gwXczG3ja3C1FVzzddry5oPwSp0dobH5TkR0dvKETc5lOIqMR4erslUKhPBK4UdKSM1MKVI2wGyzE4xkPLLeqHFl/BShMNerDVcd61v897r3dlZ6QKm72DnPKHfN4pK9NG4K085F7UZ9m6+WooliPIKNsshkJrvfr7u63T/yWBa7iKWNiYtVbUZqR1YGbGlmY0Xc732RBr24oaDPq916R+E5ExJVuCR+OLlmogqGuC3v/u1o83cOXja83Drn8I00bbfGVLLGCQmFpTO3BJcwMNUyHrS4PUvhcqRgkNESnc2kvkQs6QS5u1udYg7WrdFZ89ZimCr8FrPZnw9VTra/whT/xa5VUJujM6CrprcuLR7JDz3DzSQW4Hv3YS+vQyH/hnRX+nWzBSSEopXqG5gEHJjVdWA8fzh1fmsXaX0DZ/Jr3HNZ6NATe+n2GllsQTBR1uUTXPfdbbb2iXSRWl9KcCu/6wRmZv45doxpLivM1paTJcwKElQxVjmpqr4tMYBJak81drPz4wYPoYcBv5Z/4kQm8cmG3hsSuq6axfb1IlIS7u4ihF1wz2qTcrNuI1CKnGtTE="
+    server: https://test.pypi.org/legacy/
+    distributions: sdist
+    skip_existing: true
+    skip_cleanup: true
+    on:
+      repo: ifduyue/python-xxhash-cffi
+      tags: false
+      branch: master
+      condition: -n "${XXHASH_BUILDWHEELS:-}"
+
+  # deploy tags to PyPI
+  - provider: pypi
+    user: ifduyue
+    password:
+      secure: "t4FeCxfQPjfshJpxQ48NNGWMkXnDQRPWE0CB4bNGZ1kCDyDtYWCFXFGEq6u7u00zWKxqi16OocB2SF1Hbs0t9ercneD4oI58GWLzGMCYLG56PBSLPifJP3QbuYBvOwRKJajV9uLpLEuHr8TEBf8y4zXAPDxtfeiXsDyZ+n6RwYAXG90QF0UH8s8e3wVTVSiBPoFspkHPu5EnKJwHASiWFd5s613zPFaiZPQMeH23sf+D8EqeXLz5lRJMH0+2ykpoXoXT5Dulw7NBcT9MkbxmEpv5WBo87NPRuMehLO363AYmJPt/yH5lP3vMJ4NlwmY5sFtPqmJI/ncVL3vVImjmFbb6WcT7BnUIz1x0w/j6zaQKcBlXwbHaWZHnCiJ4jSNt+4bZovRN4uGzQGh7UztaTe/HC3f9+epu46im4aMhW+2b+HhJhUIioqyHYFFYnqUd4nt/4kHLDp4p+7gl7uTTQPOSQ5uhtdzIN2nE0LHqOY3BnqW+MAAhRwZAhFKIZsrcsis8C1rtE+NZedjq7xjzG3IkxOu3QmS+HAUpnhRUO1zKJc/WKrLF4B++fzx67dB8Po3AGBk3raoFrZXU+REk992OuAx0E+sYQCtGSPcHQ1cELDingUWzEK2qxtwEKL38wv7+qfIbYA+z4UGp9Jp1eZn21XEzVib6E3bwoLk7YYc="
+    distributions: sdist
+    skip_existing: true
+    skip_cleanup: true
+    on:
+      repo: ifduyue/python-xxhash-cffi
+      tags: true
+      condition: -n "${XXHASH_BUILDWHEELS:-}"

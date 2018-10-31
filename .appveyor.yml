@@ -1,4 +1,10 @@
 environment:
+  global:
+    PYPI_USER: ifduyue
+    PYPI_TEST_PASSWORD:
+      secure: Ub5TGKonq/xFgzRLFMCcKQ==
+    PYPI_PASSWORD:
+      secure: fFfFN5N5920gtX3+pwrOddk/psDk3wK67snCOt209bc=
   matrix:
     - PYTHON: "C:\\Python26"
     - PYTHON: "C:\\Python26-x64"
@@ -13,6 +19,9 @@ environment:
     - PYTHON: "C:\\Python35-x64"
     - PYTHON: "C:\\Python36"
     - PYTHON: "C:\\Python36-x64"
+    # build wheels
+    - PYTHON: "C:\\Python36-x64"
+      XXHASH_BUILDWHEELS: 1
 
 build: off
 
@@ -27,10 +36,32 @@ test_script:
     - '%PYTHON%\python.exe setup.py test'
 
 after_test:
-    - '%PYTHON%\python.exe setup.py bdist_wheel'
-    - '%PYTHON%\python.exe setup.py bdist_wininst'
-    - '%PYTHON%\python.exe setup.py bdist_msi'
-    - ps: ls dist
+    - ps: |
+      if (Test-Path env:XXHASH_BUILDWHEELS) {
+        python -m pip install -U pip setuptools cibuildwheel
+        cibuildwheel --output-dir wheels
+        ls wheels
+      }
 
 artifacts:
     - path: dist\*
+
+
+n_success:
+  # deploy master non-tags to Test PyPI
+  - ps: |
+      if (!(Test-Path env:XXHASH_BUILDWHEELS)) { return }
+      if (Test-Path env:APPVEYOR_PULL_REQUEST_NUMBER) { return }
+      if ($env:APPVEYOR_REPO_NAME -ne 'ifduyue/python-xxhash-cffi') { return }
+      if ($env:APPVEYOR_REPO_BRANCH -ne 'master') { return }
+      pip install -U twine
+      twine upload -u $env:PYPI_USER -p $env:PYPI_TEST_PASSWORD --repository-url https://test.pypi.org/legacy/ --skip-existing wheels\*.whl
+
+  # deploy tags to PyPI
+  - ps: |
+      if (!(Test-Path env:XXHASH_BUILDWHEELS)) { return }
+      if (Test-Path env:APPVEYOR_PULL_REQUEST_NUMBER) { return }
+      if ($env:APPVEYOR_REPO_NAME -ne 'ifduyue/python-xxhash-cffi') { return }
+      if ($env:APPVEYOR_REPO_TAG -ne 'true') { return }
+      pip install -U twine
+      twine upload -u $env:PYPI_USER -p $env:PYPI_PASSWORD --skip-existing wheels\*.whl
