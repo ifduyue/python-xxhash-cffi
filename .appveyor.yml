@@ -26,17 +26,20 @@ environment:
 build: off
 
 install:
-    - git --version
-    - '%PYTHON%\python.exe --version'
-    - git submodule update --init --recursive
-    - '%PYTHON%\scripts\pip.exe install cffi wheel'
-    - '%PYTHON%\scripts\pip.exe --version'
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - git submodule update --init --recursive
+  - git --version
+  - python --version
+  - pip --version
+  - python -m pip  install --upgrade pip
+  - pip --version
+  - pip install cffi wheel
 
 test_script:
-    - '%PYTHON%\python.exe setup.py test'
+  - python setup.py test
 
 after_test:
-    - ps: |
+  - ps: |
       if (Test-Path env:XXHASH_BUILDWHEELS) {
         python -m pip install -U pip setuptools cibuildwheel
         cibuildwheel --output-dir wheels
@@ -44,10 +47,10 @@ after_test:
       }
 
 artifacts:
-    - path: dist\*
+  - path: dist\*
 
 
-n_success:
+on_success:
   # deploy master non-tags to Test PyPI
   - ps: |
       if (!(Test-Path env:XXHASH_BUILDWHEELS)) { return }
