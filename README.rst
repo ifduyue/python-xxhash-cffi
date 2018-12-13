@@ -85,7 +85,7 @@ get the integer digest.
 
 Constructors for hash algorithms provided by this module are ``xxh32()`` and ``xxh64()``.
 
-For example, to obtain the digest of the byte string ``b'Nobody inspects the spammish repetition'``.
+For example, to obtain the digest of the byte string ``b'Nobody inspects the spammish repetition'``:
 
 .. code-block:: python
 
@@ -100,7 +100,7 @@ For example, to obtain the digest of the byte string ``b'Nobody inspects the spa
     >>> x.block_size
     16
 
-More condensed.
+More condensed:
 
 .. code-block:: python
 
@@ -109,7 +109,7 @@ More condensed.
     >>> xxhash.xxh32(b'Nobody inspects the spammish repetition').digest() == x.digest()
     True
 
-An optional seed (default is 0) can be used to alter the result predictably.
+An optional seed (default is 0) can be used to alter the result predictably:
 
 .. code-block:: python
 
@@ -127,7 +127,7 @@ An optional seed (default is 0) can be used to alter the result predictably.
 
 Be careful that xxh32 takes an unsigned 32-bit integer as seed, while xxh64
 takes an unsigned 64-bit integer. Although unsigned integer overflow is
-defined behavior, it's better to not to let it happen.
+defined behavior, it's better to not to let it happen:
 
 .. code-block:: python
 
@@ -151,7 +151,7 @@ defined behavior, it's better to not to let it happen.
 
 
 ``digest()`` returns bytes of the **big-endian** representation of the integer
-digest.
+digest:
 
 .. code-block:: python
 
@@ -171,7 +171,7 @@ digest.
     17241709254077376921
 
 Besides xxh32/xxh64 mentioned above, oneshot functions are also provided.
-By using oneshot functions we can avoid creating XXH32/64_state on heap.
+By using oneshot functions we can avoid allocating XXH32/64_state on heap:
 
     | xxh32_digest(bytes, seed)
     | xxh32_intdigest(bytes, seed)
