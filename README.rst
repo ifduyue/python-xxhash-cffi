@@ -224,3 +224,9 @@ Copyright and License
 Copyright (c) 2014-2018 Yue Du - https://github.com/ifduyue
 
 Licensed under `BSD 2-Clause License <http://opensource.org/licenses/BSD-2-Clause>`_
+
+v1.3.0 2018-12-16
+~~~~~~~~~~~~~~~~~
+
+- Wheels are now built automatically
+- Split CFFI variant into a separate package `ifduyue/python-xxhash-cffi <https://github.com/ifduyue/python-xxhash-cffi>`_
