@@ -173,18 +173,16 @@ digest:
 Besides xxh32/xxh64 mentioned above, oneshot functions are also provided.
 By using oneshot functions we can avoid allocating XXH32/64_state on heap:
 
-    | xxh32_digest(bytes, seed)
-    | xxh32_intdigest(bytes, seed)
-    | xxh32_hexdigest(bytes, seed)
-    | xxh64_digest(bytes, seed)
-    | xxh64_intdigest(bytes, seed)
-    | xxh64_hexdigest(bytes, seed)
+    | xxh32_digest(bytes, seed=0)
+    | xxh32_intdigest(bytes, seed=0)
+    | xxh32_hexdigest(bytes, seed=0)
+    | xxh64_digest(bytes, seed=0)
+    | xxh64_intdigest(bytes, seed=0)
+    | xxh64_hexdigest(bytes, seed=0)
 
 .. code-block:: python
 
     >>> import xxhash_cffi as xxhash
-    >>> xxhash.xxh64('a').digest == xxhash.xxh64_digest('a')
-    False
     >>> xxhash.xxh64('a').digest() == xxhash.xxh64_digest('a')
     True
     >>> xxhash.xxh64('a').intdigest() == xxhash.xxh64_intdigest('a')
