@@ -26,19 +26,17 @@ environment:
 build: off
 
 install:
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-  - git submodule update --init --recursive
   - git --version
   - python --version
-  - pip --version
-  - python -m pip  install --upgrade pip
-  - pip --version
-  - pip install cffi wheel
+  - '%PYTHON%\python.exe --version'
+
+  - git submodule update --init --recursive
+  - '%PYTHON%\scripts\pip.exe install wheel cffi'
+  - '%PYTHON%\scripts\pip.exe --version'
+  - set
 
 test_script:
-  - python setup.py test
-
-after_test:
+  - '%PYTHON%\python.exe setup.py test'
   - ps: |
       if (Test-Path env:XXHASH_BUILDWHEELS) {
         python -m pip install -U pip setuptools cibuildwheel
@@ -46,8 +44,10 @@ after_test:
         ls wheels
       }
 
+
 artifacts:
-  - path: dist\*
+  - path: wheels\*.whl
+    name: Wheels
 
 
 on_success:
